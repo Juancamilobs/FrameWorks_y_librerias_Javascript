@@ -39,55 +39,76 @@ column.each(function () {
     }
   });
 }
+function getUbicacion(element){
+  informativos = new Array
+  informativos[0] = $(element).next()[0];
+  informativos[1] = $(element).prev()[0];
+  informativos[2] = $(element).nextAll()
+  informativos[3] = $(element).prevAll()
+  informativos[4] = $(element).parent().nextAll()
+  informativos[5] = $(element).parent().prevAll()
+  informativos[6] = 5-Number(informativos[2].length)
+  informativos[7] = 7-Number(informativos[4].length)
+  colSiguiente=informativos[4]=$(element).parent().next();
+  colAnterior=informativos[5]=$(element).parent().prev();
+  informativos[8] = $(colSiguiente).children()[informativos[6]-1]
+  informativos[9] = $(colAnterior).children()[informativos[6]-1]
+  return informativos
+}
+
 function buscarIguales (element,direccion){
-  indexCon = 0;
-  coincidencias= new Array
-  lSiguientes=$(element).nextAll()
-  lAnteriores=$(element).prevAll()
-  cSiguientes=$(element).parent().nextAll()
-  cAnteriores=$(element).parent().prevAll()
-  indexL=5-lSiguientes.length
-  indexC= 7-cSiguientes.length
+  e=getUbicacion(element);
   switch(direccion) {
 
-    case "arriba":
-    siguiente=getSiguiente(element)
-      if($(element).attr('src')==$(siguiente).attr('src')){
-        $(siguiente).addClass('igual')
-      }
-
-      break;
     case "abajo":
-      anterior=getAnterior(element)
-      if($(element).attr('src')==$(anterior).attr('src')){
-        $(anterior).addClass('igual')
+      while(e[2]!=undefined){
+        if($(element).attr('src')==$(e[0]).attr('src')){
+          $(e[0]).addClass('igual');
+          elemento=e[0];
+          e=getUbicacion(elemento)
+        }else{
+          break;
+        }
       }
+      break;
+    case "arriba":
+    while(e[3]!=undefined){
+      if($(element).attr('src')==$(e[1]).attr('src')){
+        $(e[1]).addClass('igual');
+        elemento=e[1];
+        e=getUbicacion(elemento)
+      }else{
+        break;
+      }
+    }
       break;
     case "derecha":
-      var colSiguiente=$(cSiguientes[0]).children()[indexL-1];
-      if($(colSiguiente).attr('src')==$(element).attr('src')){
-        $(colSiguiente).addClass('igual')
+    while(e[4]!=undefined){
+      if($(element).attr('src')==$(e[8]).attr('src')){
+        $(e[8]).addClass('igual');
+        elemento=e[8];
+        e=getUbicacion(elemento)
+      }else{
+        break;
       }
+    }
       break;
     case "izquierda":
-      var colAnterior=$(cAnteriores[0]).children()[indexL-1];
-      if($(colAnterior).attr('src')==$(element).attr('src')){
-        $(colAnterior).addClass('igual')
+    while(e[5]!=undefined){
+      if($(element).attr('src')==$(e[9]).attr('src')){
+        $(e[9]).addClass('igual');
+        elemento=e[9];
+        e=getUbicacion(elemento)
+      }else{
+        break;
       }
+    }
       break;
-    default:alert('no hay coincidencias')
-
+    default:
   }
 }
-function getSiguiente(element){
-  siguiente = $(element).next()[0];
-  return siguiente
-}
 
-function getAnterior(element){
-  anterior = $(element).prev()[0];
-  return anterior
-}
+
 // function lineaIndex(element){
 //  LSiguientes=$(element).nextAll()
 //  LAnteriores=$(element).prevAll()
@@ -119,11 +140,19 @@ function getAnterior(element){
 
 
 
-function dulceClick(element){
-  $(element).remove();
-  puntaje=Number($('#movimientos-text').text())
-  puntaje=puntaje+1;
-  $('#movimientos-text').text(puntaje)
+function eliminarCoincidencia(element){
+  if($('.igual').length>2){
+    movimientos=Number($('#movimientos-text').text())
+    movimientos=movimientos+1;
+    puntaje=Number($('#score-text').text())
+    puntaje=puntaje+($('.igual').length)
+    $('#movimientos-text').text(movimientos)
+    $('#score-text').text(puntaje)
+    $('.igual').remove();
+  }else{
+    $('.igual').removeClass('igual')
+    alert('no hay mas de tres dulces juntos!')
+  }
 }
 
 
@@ -132,8 +161,13 @@ $(function() {
   fillBoard();
   $('.element').on('click',function (event){
       $(this).toggleClass('igual')
-      buscarIguales(this,"arriba")
+      buscarIguales(this,"izquierda")
+      buscarIguales(this,"derecha")
       buscarIguales(this,"abajo")
+      buscarIguales(this,"arriba")
+      eliminarCoincidencia(this)
+
+
 
 
 
