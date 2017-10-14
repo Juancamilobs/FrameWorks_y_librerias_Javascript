@@ -1,178 +1,158 @@
-function color1 (elemento){
-  $(elemento).animate(
-    {
-      color: "red"
-    },700,function(){
-      color2(elemento)
-    }
-  )
-};
-function color2 (elemento){
-  $(elemento).animate(
-    {
-      color: "yellow"
-    },700,function(){
-      color1(elemento)
-    }
-  )
-};
-function getRandomInt(b,a){
-  numero = Math.floor(Math.random()*a )+b
-  //ruta = "<img src='image/"+numero+".png' id='dulce' alt='dulce'>";
-  return numero
-};
-
-function fillBoard() {
-var top = 5;
-var column = $('[class^="col-"]');
-
-column.each(function () {
-  var candys = $(this).children().length;
-  var agrega = top - candys;
-  for (var i = 0; i < agrega; i++) {
-      var candyType = getRandomInt(1, 4);
-      if (i === 0 && candys < 1) {
-        $(this).append('<img src="image/' + candyType + '.png" class="element col-"></img>');
-      } else {
-        $(this).find('img:eq(0)').before('<img src="image/' + candyType + '.png" class="element"></img>');
-      }
-    }
-  });
+/* Animacion del titulo*/
+function cambioColor(){
+    $('.main-titulo').css('color','white')
+    setTimeout(function(){
+        $('.main-titulo').css('color','yellow')
+    },500)
 }
-function getUbicacion(element){
-  informativos = new Array
-  informativos[0] = $(element).next()[0];
-  informativos[1] = $(element).prev()[0];
-  informativos[2] = $(element).nextAll()
-  informativos[3] = $(element).prevAll()
-  informativos[4] = $(element).parent().nextAll()
-  informativos[5] = $(element).parent().prevAll()
-  informativos[6] = 5-Number(informativos[2].length)
-  informativos[7] = 7-Number(informativos[4].length)
-  colSiguiente=informativos[4]=$(element).parent().next();
-  colAnterior=informativos[5]=$(element).parent().prev();
-  informativos[8] = $(colSiguiente).children()[informativos[6]-1]
-  informativos[9] = $(colAnterior).children()[informativos[6]-1]
-  return informativos
+function inicioVariables(){
+  i=0;
+  score=Number($('#score-text').html());
+  indice = new Array;
+  indicador = false;
+  numDulces = 0;
+  segundos = 10;
+  minutos = 0;
 }
+function lineaDulces(){
+  i=i+1
+    if (i<8){
+    for (j=1;j<8;j++){
+      numero = Math.floor(Math.random()*4)+1
+      ruta = "image/"+numero+".png"
+      $('.col-'+j).prepend('<img src="'+ruta+'"class="elemento" >').css("justify-content","flex-start")
+    }
+  }
+  if(i==8){
+    clearInterval(crearDulces)
+    indicador = true;
+    eliminar = setInterval(function (){eliminarActivos()},150);
 
-function buscarIguales (element,direccion){
-  e=getUbicacion(element);
-  switch(direccion) {
-
-    case "abajo":
-      while(e[2]!=undefined){
-        if($(element).attr('src')==$(e[0]).attr('src')){
-          $(e[0]).addClass('igual');
-          elemento=e[0];
-          e=getUbicacion(elemento)
-        }else{
-          break;
+  }
+}
+function bHorizontal(){
+  for (x=1;x<8;x++){
+    for (y=1;y<6;y++){
+      var pos1 = $('.col-'+y).children("img:nth-last-child("+x+")").attr('src')
+      var pos2 = $('.col-'+(y+1)).children("img:nth-last-child("+x+")").attr('src')
+      var pos3 = $('.col-'+(y+2)).children("img:nth-last-child("+x+")").attr('src')
+      if ((pos1==pos2) && (pos2==pos3) && (pos1!=null) && (pos2!=null) && (pos3!=null)){
+          $('.col-'+y).children("img:nth-last-child("+x+")").attr('class','elemento activo')
+          $('.col-'+(y+1)).children("img:nth-last-child("+x+")").attr('class','elemento activo')
+          $('.col-'+(y+2)).children("img:nth-last-child("+x+")").attr('class','elemento activo')
         }
-      }
-      break;
-    case "arriba":
-    while(e[3]!=undefined){
-      if($(element).attr('src')==$(e[1]).attr('src')){
-        $(e[1]).addClass('igual');
-        elemento=e[1];
-        e=getUbicacion(elemento)
-      }else{
-        break;
-      }
     }
-      break;
-    case "derecha":
-    while(e[4]!=undefined){
-      if($(element).attr('src')==$(e[8]).attr('src')){
-        $(e[8]).addClass('igual');
-        elemento=e[8];
-        e=getUbicacion(elemento)
-      }else{
-        break;
-      }
-    }
-      break;
-    case "izquierda":
-    while(e[5]!=undefined){
-      if($(element).attr('src')==$(e[9]).attr('src')){
-        $(e[9]).addClass('igual');
-        elemento=e[9];
-        e=getUbicacion(elemento)
-      }else{
-        break;
-      }
-    }
-      break;
-    default:
   }
-}
-
-
-// function lineaIndex(element){
-//  LSiguientes=$(element).nextAll()
-//  LAnteriores=$(element).prevAll()
-//  if($(element).attr('src')==$(siguientes[0]).attr('src')){
-//    alert('el de abajo es igual')
-//  }
-//  if ($(element).attr('src')==$(anteriores[0]).attr('src')){
-//    alert('el de arriba es igual')
-//  }
-//  indexL=5-siguientes.length
-//  return indexL
-//}
-//function columnaIndex(element){
-//  cSiguientes=$(element).parent().nextAll()
-  //CAnteriores=$(element).parent().prevAll()
-  //indexC= 7-siguientes.length
-  //var colSiguiente=$(siguientes[0]).children()[indexL-1];
-  //if($(colSiguiente).attr('src')==$(element).attr('src')){
-  //  alert('el de la derecha es igual')
-  //}
-  //var colAnterior=$(anteriores[0]).children()[indexL-1];
-  //if($(colAnterior).attr('src')==$(element).attr('src')){
-  //  alert('el de la izquierda es igual')
-  //}
-
-  //console.log("El objeto esta en la columna "+indexC)
-  //return indexC
-//}
-
-
-
-function eliminarCoincidencia(element){
-  if($('.igual').length>2){
-    movimientos=Number($('#movimientos-text').text())
-    movimientos=movimientos+1;
-    puntaje=Number($('#score-text').text())
-    puntaje=puntaje+($('.igual').length)
-    $('#movimientos-text').text(movimientos)
-    $('#score-text').text(puntaje)
-    $('.igual').remove();
+  if ($('.activo').length>0){
+    return true
   }else{
-    $('.igual').removeClass('igual')
-    alert('no hay mas de tres dulces juntos!')
+    return false
   }
 }
+function bVertical(){
+  for (y=1;y<8;y++){
+    for (x=1;x<6;x++){
+      var pos1 = $('.col-'+y).children("img:nth-last-child("+x+")").attr('src')
+      var pos2 = $('.col-'+y).children("img:nth-last-child("+(x+1)+")").attr('src')
+      var pos3 = $('.col-'+y).children("img:nth-last-child("+(x+2)+")").attr('src')
+      if ((pos1==pos2) && (pos2==pos3) && (pos1!=null) && (pos2!=null) && (pos3!=null)){
+          $('.col-'+y).children("img:nth-last-child("+x+")").attr('class','elemento activo')
+          $('.col-'+y).children("img:nth-last-child("+(x+1)+")").attr('class','elemento activo')
+          $('.col-'+y).children("img:nth-last-child("+(x+2)+")").attr('class','elemento activo')
+      }
+    }
+  }
+  if ($('.activo').length>0){
+    return true
+  }else{
+    return false
+  }
+}
+function nuevosDulces(indice){
+  numDulces=0;
+  for(var j=1;j<8;j++)
+    {
+      numDulces=numDulces+$(".col-"+j).children().length;
+    }
+  if (numDulces!=49){
+    for  (j=1;j<8;j++){
+          if (indice[j-1]>0){
+            numero = Math.floor(Math.random()*4)+1;
+            ruta = "image/"+numero+".png"
+            $('.col-'+j).prepend('<img src="'+ruta+'"class="elemento" >').css("justify-content","flex-start")
+            $("div[class^='col']").css("justify-content","flex-end")
+            indice[j-1]=indice[j-1]-1;
+          }
+      }
+  }
+
+  if (numDulces==49){
+    clearInterval(rellenarDulces);
+    eliminar = setInterval(function (){eliminarActivos()},150);
+  }
+
+  }
+function tiempo(){
+
+  if (segundos == 0){
+    segundos = 60;
+    minutos = minutos - 1;
+  }
+  if (segundos!=0){
+    segundos = segundos - 1
+  }
+  if( segundos == 0 && minutos == 0){
+    clearInterval(timer);
+    $('.panel-tablero').hide();
+    $('.elemento').hide();
+    $('.panel-score').css('width','100%')
+    $('div.time').hide();
+  }
+  if(segundos > 9 )
+  {
+      $('#timer').html("0"+minutos+":"+segundos)
+  }else{
+    $('#timer').html("0"+minutos+":0"+segundos)
+  }
 
 
-$(function() {
-  color1($('.main-titulo'));
-  fillBoard();
-  $('.element').on('click',function (event){
-      $(this).toggleClass('igual')
-      buscarIguales(this,"izquierda")
-      buscarIguales(this,"derecha")
-      buscarIguales(this,"abajo")
-      buscarIguales(this,"arriba")
-      eliminarCoincidencia(this)
+}
+function eliminarActivos(){
+  numDulces = 0;
+  for(var j=1;j<8;j++)
+    {
+      numDulces=numDulces+$(".col-"+j).children().length;
+    }
+  if (bVertical() || bHorizontal() && numDulces==49){
+
+    $("div[class^='col']").css("justify-content","flex-end")
+    $('.activo').hide('pulsate',1000,function(){
+    var activos = $('.activo').length;
+        $('.activo').remove('img');
+        score = score+activos;
+        $('#score-text').html(score)
+    })
+  }
+  if (!bVertical() && !bHorizontal() && numDulces!=49 && indicador == true){
+    for (j=1;j<8;j++){
+        indice [j-1] = 7 - $(".col-"+j).children().length
+    }
+    clearInterval(eliminar)
+    rellenarDulces = setInterval(function(){nuevosDulces(indice)},800)
+
+  }
 
 
+};
+$(function (){
+  setInterval(function(){cambioColor()},1100);
+  $('.btn-reinicio').on('click',function(){
+    inicioVariables();
+    timer = setInterval(function(){tiempo()},1000)
+    crearDulces = setInterval(function(){lineaDulces()},800)
 
 
 
   })
 
-
-
-  });
+})
