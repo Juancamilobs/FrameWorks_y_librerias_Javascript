@@ -11,8 +11,9 @@ function inicioVariables(){
   indice = new Array;
   indicador = false;
   numDulces = 0;
-  segundos = 10;
+  segundos = 30;
   minutos = 0;
+  findeljuego = false;
 }
 function lineaDulces(){
   i=i+1
@@ -103,6 +104,9 @@ function tiempo(){
   }
   if( segundos == 0 && minutos == 0){
     clearInterval(timer);
+    findeljuego = true;
+    clearInterval(crearDulces);
+    clearInterval(rellenarDulces);
     $('.panel-tablero').hide();
     $('.elemento').hide();
     $('.panel-score').css('width','100%')
@@ -144,12 +148,38 @@ function eliminarActivos(){
 
 
 };
+function btnInicio(){
+if (($('.btn-reinicio').html())=='Iniciar'){
+  inicioVariables();
+  $('.btn-reinicio').html('Reiniciar');
+  timer = setInterval(function(){tiempo()},1000);
+  crearDulces = setInterval(function(){lineaDulces()},800);
+  //clearInterval(timer)
+  }
+  if ((($('.btn-reinicio').html())=='Reiniciar')){
+
+    $('.elemento').remove();
+    $('.panel-tablero').show();
+    $('.elemento').show();
+    $('.panel-score').css('width','25%')
+    $('div.time').show();
+    if (findeljuego==true){
+        clearInterval(rellenarDulces);
+        clearInterval(crearDulces);
+
+        clearInterval(eliminar);
+        $('.btn-reinicio').html('Iniciar');
+        $('#score-text').html('0');
+        $('#movimients-text').html('0')
+    }
+  }
+}
+
 $(function (){
   setInterval(function(){cambioColor()},1100);
   $('.btn-reinicio').on('click',function(){
-    inicioVariables();
-    timer = setInterval(function(){tiempo()},1000)
-    crearDulces = setInterval(function(){lineaDulces()},800)
+    btnInicio();
+
 
 
 
