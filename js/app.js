@@ -8,12 +8,14 @@ function cambioColor(){
 function inicioVariables(){
   i=0;
   score=Number($('#score-text').html());
+  movimientos = Number($('#movimientos-text').html());
   indice = new Array;
   indicador = false;
   numDulces = 0;
-  segundos = 30;
-  minutos = 0;
+  segundos = 0;
+  minutos = 2;
   findeljuego = false;
+  espera = 1;
 }
 function lineaDulces(){
   i=i+1
@@ -145,15 +147,70 @@ function eliminarActivos(){
     rellenarDulces = setInterval(function(){nuevosDulces(indice)},800)
 
   }
+  if (!bVertical() && !bHorizontal() && numDulces==49 && indicador == true){
+
+    $('.elemento').draggable({
+        disabled: false,
+        containment: ".panel-tablero",
+        revert: true,
+        revertDuration: 0,
+        snap: ".elemento",
+        snapMode: "inner",
+        snapTolerance: 40,
+        start: function(event, ui){
+          movimientos=movimientos+1;
+          $("#movimientos-text").html(movimientos)
+        }
+        //dulceMovido  = $(this);
+
+    });
+    var dulceMovido = '';
+    var dulceCaido = '';
+    clearInterval(eliminar);
+    }
+
+  $('.elemento').droppable({
+      drop: function (event, ui) {
+        var dropped = ui.draggable;
+        var droppedOn = this;
+        espera=0;
+        do{
+          espera=dropped.swap($(droppedOn));
+        }while(espera==0)
+
+        if(!bHorizontal() && !bVertical())
+        {
+          dropped.swap($(droppedOn));
+        }
+        if(bHorizontal() || bVertical())
+        {
+          clearInterval(rellenarDulces);
+          clearInterval(eliminar);
+          eliminar=setInterval(function(){eliminarActivos()},150);
+        }
+      }
+    })
+  }
+
+jQuery.fn.swap = function(b)
+    {
+        b = jQuery(b)[0];
+        var a = this[0];
+        var t = a.parentNode.insertBefore(document.createTextNode(''), a);
+        b.parentNode.insertBefore(a, b);
+        t.parentNode.insertBefore(b, t);
+        t.parentNode.removeChild(t);
+        return this;
+  };
 
 
-};
+
 function btnInicio(){
-if (($('.btn-reinicio').html())=='Iniciar'){
-  inicioVariables();
-  $('.btn-reinicio').html('Reiniciar');
-  timer = setInterval(function(){tiempo()},1000);
-  crearDulces = setInterval(function(){lineaDulces()},800);
+  if (($('.btn-reinicio').html())=='Iniciar'){
+    inicioVariables();
+    $('.btn-reinicio').html('Reiniciar');
+    timer = setInterval(function(){tiempo()},1000);
+    crearDulces = setInterval(function(){lineaDulces()},800);
   //clearInterval(timer)
   }
   if ((($('.btn-reinicio').html())=='Reiniciar')){
@@ -170,7 +227,7 @@ if (($('.btn-reinicio').html())=='Iniciar'){
         clearInterval(eliminar);
         $('.btn-reinicio').html('Iniciar');
         $('#score-text').html('0');
-        $('#movimients-text').html('0')
+        $('#movimientos-text').html('0')
     }
   }
 }
